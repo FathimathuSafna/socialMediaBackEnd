@@ -38,19 +38,18 @@ const userSignup = async (req, res) => {
 };
 
 const verifyOtp = async (req, res) => {
-  const { phoneNumber, otp } = req.body;
+  const { otp } = req.body;
   console.log(req.body);
   try {
-    const existUser = await User.findOne({ phoneNumber,otp,isVerified: false });
+    const existUser = await User.findOne({ otp,isVerified: false });
     if (!existUser) {
       return res.status(400).json({
         msg: "Invalid OTP",
       });
     } else {
       const updateUser = await User.findOneAndUpdate(
-        {phoneNumber},
-        { otp: null,isVerified: true },
-        { new: true }
+       
+        { otp: null,isVerified: true,new: true }
       );
       return res.status(200).json({
         msg: "OTP verified successfully",
@@ -65,12 +64,13 @@ const verifyOtp = async (req, res) => {
 };
 
 const userLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const { phoneNumber, password } = req.body;
+  console.log(req.body);
   try {
-    const existUser = await User.findOne({ email });
-    if (!existUser.isVerified) {
+    const existUser = await User.findOne({ phoneNumber });
+    if (!existUser) {
       res.status(400).json({
-        msg: "user not found",
+        msg: "user not verified",
       });
     }
     if (await existUser.matchPassword(password)) {

@@ -2,6 +2,8 @@ import express from "express";
 import "dotenv/config";
 import connectDB from "./config/connection.js"
 import userRoutes from './routes/userRoutes.js'
+import postRoutes from './routes/postRoutes.js'
+import followerRoutes from './routes/followerRoutes.js'
 import cors from "cors";
 
 // Configure CORS
@@ -16,6 +18,9 @@ const app = express();
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
@@ -24,6 +29,10 @@ app.get("/", (req, res) => {
 
 
 app.use("/user",userRoutes)
+app.use("/post",postRoutes)
+app.use('/follower',followerRoutes)
+
+
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);
 });

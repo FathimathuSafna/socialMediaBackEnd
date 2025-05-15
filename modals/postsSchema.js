@@ -9,7 +9,6 @@ var postSchema = new Schema({
     },
     location: {
         type: String,
-        required: true
     },
     postImageUrl: {
         type: String,
@@ -17,15 +16,14 @@ var postSchema = new Schema({
     },
     description: {
         type: String,
-        required: true
     },
     isArchived:{
         type: Boolean,
-        required: true
+        default:false
     },
     status:{
         type:Boolean,
-        required:true
+        default:true
     }
 })
 
