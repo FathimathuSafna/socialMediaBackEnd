@@ -49,7 +49,8 @@ const verifyOtp = async (req, res) => {
     } else {
       const updateUser = await User.findOneAndUpdate(
        
-        { otp: null,isVerified: true,new: true }
+        { otp: null,isVerified: true},
+        {new: true }
       );
       return res.status(200).json({
         msg: "OTP verified successfully",

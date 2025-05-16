@@ -87,8 +87,8 @@ const getFollowing = async (req, res) => {
 }
 
 const getFollowers = async (req, res) => {
-  const { id } = req.params; // This is your userId (you want to know who DID NOT follow you)
-
+const id = req.user._id //passing from middleware
+console.log("Received ID:", id);
   try {
     // Step 1: Find who followed you
     const followers = await followerDetails.find({ followedUserId: id });
@@ -99,7 +99,7 @@ const getFollowers = async (req, res) => {
     // Step 3: Get all users who are NOT in that list (did NOT follow you)
     const nonFollowers = await User.find({
       _id: { $nin: followerIds, $ne: id } // exclude your own ID too
-    }).select("name email profileImage");
+    }).select("name profileImageUrl");
 
     if (!nonFollowers || nonFollowers.length === 0) {
       return res.status(404).json({

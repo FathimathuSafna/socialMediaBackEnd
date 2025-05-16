@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 
 app.use("/user",userRoutes)
 app.use("/post",postRoutes)
-app.use('/follower',followerRoutes)
+app.use('/follow',followerRoutes)
 
 
 app.listen(PORT, () => {
