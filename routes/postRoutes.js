@@ -4,6 +4,6 @@ import protect from '../middleWare/userMiddleWare.js'
 
 const app = express.Router()
 app.route('/').post(protect,createPost).get(getAllPosts)
-app.route('/:id').get(getFollowerPosts)
+app.route('/following').get(protect,getFollowerPosts)
 
 export default app

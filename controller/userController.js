@@ -92,6 +92,22 @@ const userLogin = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      msg: "All users",
+      status: true,
+      data: users,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: false,
+      err,
+    });
+  }
+};
+
 const updateDetails = async (req, res) => {
   try {
     let id = req.params.id;
@@ -107,4 +123,4 @@ const updateDetails = async (req, res) => {
   }
 };
 
-export { userSignup, verifyOtp, userLogin, updateDetails };
+export { userSignup, verifyOtp, userLogin,getAllUsers, updateDetails };

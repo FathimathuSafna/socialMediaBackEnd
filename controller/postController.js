@@ -37,7 +37,7 @@ const getAllPosts = async (req, res) => {
 }
 
 const getFollowerPosts = async (req, res) => {
-  const { id } = req.params;
+  const id = req.user._id; // id passing from middleware
 
   try {
     // Step 1: Get all the users this person is following

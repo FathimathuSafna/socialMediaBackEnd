@@ -4,11 +4,14 @@ import User from "../modals/userSchema.js";
 
 const follow = async (req, res) => {
     console.log("Received body:", req.body);
-    const  {userId,followedUserId}  = req.body;
+    const userId = req.user._id; // id passing from middleware
+    const { followedUserId } = req.body;
+    console.log("User ID from middleware:", userId);
+    console.log("###########")
     try {
         const existUser = await followerDetails.findOne({
-        userId,
-        followedUserId,
+        userId: userId,
+        followedUserId: followedUserId,
         });
         if (existUser) {
         return res.status(400).json({
@@ -16,8 +19,8 @@ const follow = async (req, res) => {
         });
         }
         const followDetails = await followerDetails.create({
-        userId,
-        followedUserId,
+        userId: userId,
+        followedUserId: followedUserId,
         });
         res.status(201).json({
         msg: "Followed successfully",
