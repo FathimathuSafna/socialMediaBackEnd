@@ -4,7 +4,7 @@ import protect from '../middleWare/userMiddleWare.js'
 const app = express.Router()
 
 app.route('/').post(userSignup).get(getAllUsers)
-app.route('/verify').post(protect,verifyOtp)
+app.route('/verify').post(verifyOtp)
 app.route('/login').post(userLogin)
 app.route("/:id").put(protect,updateDetails)
 

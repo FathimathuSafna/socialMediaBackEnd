@@ -39,18 +39,22 @@ const userSignup = async (req, res) => {
 
 const verifyOtp = async (req, res) => {
   const { otp } = req.body;
-  console.log(req.body);
   try {
-    const existUser = await User.findOne({ otp,isVerified: false });
+    const existUser = await User.findOne({ otp: otp, isVerified: false });
     if (!existUser) {
       return res.status(400).json({
         msg: "Invalid OTP",
       });
     } else {
       const updateUser = await User.findOneAndUpdate(
-       
-        { otp: null,isVerified: true},
-        {new: true }
+        { _id: existUser._id },
+        {
+          $set: {
+            otp: null,
+            isVerified: true,
+          },
+        },
+        { new: true }
       );
       return res.status(200).json({
         msg: "OTP verified successfully",
@@ -123,4 +127,4 @@ const updateDetails = async (req, res) => {
   }
 };
 
-export { userSignup, verifyOtp, userLogin,getAllUsers, updateDetails };
+export { userSignup, verifyOtp, userLogin, getAllUsers, updateDetails };

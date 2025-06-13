@@ -13,6 +13,7 @@ const follow = async (req, res) => {
         userId: userId,
         followedUserId: followedUserId,
         });
+        console.log("Existing follow details:", existUser);
         if (existUser) {
         return res.status(400).json({
             msg: "Already following this user",
@@ -22,7 +23,7 @@ const follow = async (req, res) => {
         userId: userId,
         followedUserId: followedUserId,
         });
-        res.status(201).json({
+        return res.status(201).json({
         msg: "Followed successfully",
         status: true,
         data: followDetails,
