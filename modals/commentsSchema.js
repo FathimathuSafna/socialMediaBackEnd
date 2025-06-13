@@ -18,7 +18,7 @@ var commentSchema = new Schema({
     },
     isDeleted:{
         type:Boolean,
-        required:true
+        // required:true
     }
 })
 

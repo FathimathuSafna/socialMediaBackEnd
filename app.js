@@ -4,6 +4,8 @@ import connectDB from "./config/connection.js"
 import userRoutes from './routes/userRoutes.js'
 import postRoutes from './routes/postRoutes.js'
 import followerRoutes from './routes/followerRoutes.js'
+import commentRoutes from './routes/commentRoutes.js'
+import likeRoutes from './routes/likeRoutes.js'
 import cors from "cors";
 
 // Configure CORS
@@ -31,6 +33,8 @@ app.get("/", (req, res) => {
 app.use("/user",userRoutes)
 app.use("/post",postRoutes)
 app.use('/follow',followerRoutes)
+app.use('/comment',commentRoutes)
+app.use('/like',likeRoutes)
 
 
 app.listen(PORT, () => {
