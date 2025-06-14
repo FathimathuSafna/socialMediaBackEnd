@@ -45,21 +45,29 @@ const likePost = async (req, res) => {
 }
 
 const getLikeCount = async (req, res) => {
-    const postId = req.params.id; // Assuming postId is passed as a URL parameter
-    try {
-        const likeCount = await Likes.countDocuments({ postId: postId });
-        res.status(200).json({
+    const userId = req.user._id; // Assuming user ID is passed from middleware
+    const { postId } = req.params; // Assuming postId is passed in the URL
+    console.log("postId", postId);
+    try{
+        const likeCount = await Likes.countDocuments({
+            userId: userId,
+            postId: postId,
+            status: true
+        });
+        console.log("likeCount", likeCount);
+        return res.status(200).json({
             status: true,
             message: "Like count retrieved successfully",
-            data: { likeCount },
+            data: likeCount,
         });
-    } catch (error) {
-        res.status(400).json({
+    }
+    catch (error) {
+        return res.status(400).json({
             status: false,
             message: "Error retrieving like count",
             error: error.message,
         });
     }
-} 
+}
 
 export { likePost,getLikeCount };

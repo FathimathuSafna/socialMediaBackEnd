@@ -52,4 +52,73 @@ const getAllComments = async (req, res) => {
   }
 };
 
-export { createComment, getAllComments };
+const editComment = async (req, res) => {
+  const userId = req.user._id; // Assuming user ID is passed from middleware
+  const { commentId, commentText } = req.body;
+
+  try {
+    // First, check if the comment exists and belongs to the user
+    const existingComment = await Comment.findById(commentId);
+
+    if (!existingComment) {
+      return res.status(404).json({
+        status: false,
+        message: "Comment not found",
+      });
+    }
+
+    // Optional: Check if the user owns the comment
+    if (existingComment.userId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        status: false,
+        message: "You are not authorized to edit this comment",
+      });
+    }
+
+    // Update the comment
+    const updatedComment = await Comment.findByIdAndUpdate(
+      commentId,
+      { commentText },
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: true,
+      message: "Comment updated successfully",
+      data: updatedComment,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: false,
+      message: "Error updating comment",
+      error: error.message,
+    });
+  }
+};
+
+
+const deleteComment = async (req, res) => {
+  const { commentId } = req.body;
+  try {
+    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    if (!deletedComment) {
+      return res.status(404).json({
+        status: false,
+        message: "Comment not found",
+      });
+    }
+    res.status(200).json({
+      status: true,
+      message: "Comment deleted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: false,
+      message: "Error deleting comment",
+      error: error.message,
+    });
+  }
+};
+
+
+export { createComment, getAllComments,editComment, deleteComment };
