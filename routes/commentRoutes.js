@@ -3,6 +3,6 @@ import { createComment,getAllComments,editComment,deleteComment } from '../contr
 import protect from '../middleWare/userMiddleWare.js';
 
 const app = express.Router();
-app.route('/').post(protect,createComment).delete(deleteComment); 
-app.route('/:id').get(getAllComments).put(protect,editComment)
+app.route('/').post(protect,createComment)
+app.route('/:id').get(getAllComments).put(protect,editComment).delete(protect,deleteComment); 
 export default app

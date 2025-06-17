@@ -45,12 +45,12 @@ const likePost = async (req, res) => {
 }
 
 const getLikeCount = async (req, res) => {
-    const userId = req.user._id; // Assuming user ID is passed from middleware
-    const { postId } = req.params; // Assuming postId is passed in the URL
+    const userId = req.user._id// Assuming user ID is passed from middleware
+    const  postId  = req.params.id; // Assuming postId is passed in the URL
     console.log("postId", postId);
     try{
         const likeCount = await Likes.countDocuments({
-            userId: userId,
+            // userId: userId,
             postId: postId,
             status: true
         });

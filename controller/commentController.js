@@ -36,6 +36,7 @@ const getAllComments = async (req, res) => {
     );
     const formattedComments = comments.map((c) => ({
       userName: c.userId.userName,
+      commentId: c._id,
       commentText: c.commentText,
     }));
     res.status(200).json({
@@ -53,11 +54,11 @@ const getAllComments = async (req, res) => {
 };
 
 const editComment = async (req, res) => {
-  const userId = req.user._id; // Assuming user ID is passed from middleware
+  console.log("Editing comment", req.body);
+  const userId = req.user._id; 
   const { commentId, commentText } = req.body;
 
   try {
-    // First, check if the comment exists and belongs to the user
     const existingComment = await Comment.findById(commentId);
 
     if (!existingComment) {
@@ -67,7 +68,6 @@ const editComment = async (req, res) => {
       });
     }
 
-    // Optional: Check if the user owns the comment
     if (existingComment.userId.toString() !== userId.toString()) {
       return res.status(403).json({
         status: false,
@@ -98,9 +98,13 @@ const editComment = async (req, res) => {
 
 
 const deleteComment = async (req, res) => {
-  const { commentId } = req.body;
+
+  const userId = req.user._id;
+  const  commentId  = req.params.id; 
   try {
-    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    const deletedComment = await Comment.findByIdAndDelete(commentId,
+      userId
+    );
     if (!deletedComment) {
       return res.status(404).json({
         status: false,
