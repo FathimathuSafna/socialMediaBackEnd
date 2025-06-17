@@ -3,7 +3,7 @@ import {createPost,getAllPosts,getFollowerPosts} from '../controller/postControl
 import protect from '../middleWare/userMiddleWare.js'
 
 const app = express.Router()
-app.route('/').post(protect,createPost).get(getAllPosts)
+app.route('/').post(protect,createPost).get(protect,getAllPosts)
 app.route('/following').get(protect,getFollowerPosts)
 
 export default app
