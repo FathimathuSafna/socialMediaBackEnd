@@ -27,17 +27,24 @@ const createComment = async (req, res) => {
 };
 
 const getAllComments = async (req, res) => {
+  const userId = req.user._id; // Assuming user ID is passed from middleware
   const postId = req.params.id; // Assuming postId is passed as a URL parameter
   try {
     const comments = await Comment.find({ postId: postId })
     .populate(
       "userId",
-      "userName"
-    );
-    const formattedComments = comments.map((c) => ({
-      userName: c.userId.userName,
-      commentId: c._id,
-      commentText: c.commentText,
+      "userName profilePicture"
+    ).populate(
+      "postId",
+      "description"
+    )
+    console.log("comments are ......",comments)
+    const formattedComments = comments.map((comment) => ({
+      userName: comment.userId ? comment.userId.userName : "Unknown User",
+      commentId: comment._id,
+      commentText: comment.commentText,
+      postDescription :comment.postId.description,
+      isEditable: comment.userId && comment.userId._id.toString() === userId.toString(),
     }));
     res.status(200).json({
       status: true,

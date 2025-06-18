@@ -90,7 +90,7 @@ const getFollowers = async (req, res) => {
   console.log("Received ID:", id);
   try {
     // Step 1: Find who followed you
-    const followers = await followerDetails.find({ userId: id });
+    const followers = await followerDetails.find({ userId: id })
 
     // Step 2: Extract their userIds (they followed you)
     const followerIds = followers.map((f) => f.followedUserId.toString());
@@ -101,7 +101,7 @@ const getFollowers = async (req, res) => {
         { _id: { $nin: followerIds } },
         { _id: { $ne: id } },
       ],
-    }).select("name profileImageUrl");
+    }).limit(4).select("name profileImageUrl");
 
     if (!nonFollowers || nonFollowers.length === 0) {
       return res.status(404).json({

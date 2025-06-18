@@ -4,5 +4,5 @@ import protect from '../middleWare/userMiddleWare.js';
 
 const app = express.Router();
 app.route('/').post(protect,createComment)
-app.route('/:id').get(getAllComments).put(protect,editComment).delete(protect,deleteComment); 
+app.route('/:id').get(protect,getAllComments).put(protect,editComment).delete(protect,deleteComment); 
 export default app
