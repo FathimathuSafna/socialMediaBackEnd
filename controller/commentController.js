@@ -33,17 +33,14 @@ const getAllComments = async (req, res) => {
     const comments = await Comment.find({ postId: postId })
     .populate(
       "userId",
-      "userName profilePicture"
-    ).populate(
-      "postId",
-      "description"
+      "userName profilePictureUrl"
     )
     console.log("comments are ......",comments)
     const formattedComments = comments.map((comment) => ({
       userName: comment.userId ? comment.userId.userName : "Unknown User",
       commentId: comment._id,
+      profilePicture : comment.userId ? comment.userId.profilePictureUrl : null,
       commentText: comment.commentText,
-      postDescription :comment.postId.description,
       isEditable: comment.userId && comment.userId._id.toString() === userId.toString(),
     }));
     res.status(200).json({

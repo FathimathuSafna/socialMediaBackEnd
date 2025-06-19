@@ -30,7 +30,7 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
-    let posts = await Post.find().limit(20).populate("userId", "userName profilePicture").lean();
+    let posts = await Post.find().limit(20).populate("userId", "userName profilePictureUrl").lean();
     posts = await Promise.all(
       posts.map(async (post) => {
         try {

@@ -81,7 +81,10 @@ const userLogin = async (req, res) => {
     if (await existUser.matchPassword(password)) {
       return res.status(200).json({
         msg: "login success",
-        data: generateToken(existUser._id),
+        data: {
+          token: generateToken(existUser._id),
+          userName: existUser.userName,
+        },
       });
     } else {
       return res.status(400).json({
