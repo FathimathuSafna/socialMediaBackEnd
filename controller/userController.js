@@ -1,5 +1,8 @@
+import { get } from "mongoose";
+import Post from "../modals/postsSchema.js";
 import User from "../modals/userSchema.js";
 import generateToken from "../utils/generateToken.js";
+import followerDetails from "../modals/followersSchema.js";
 
 function generateOTP(length) {
   const digits = "0123456789";
@@ -101,7 +104,8 @@ const userLogin = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const userId = req.user._id;
+    const users = await User.find({ _id: { $ne: userId } })
     res.status(200).json({
       msg: "All users",
       status: true,
@@ -130,4 +134,53 @@ const updateDetails = async (req, res) => {
   }
 };
 
-export { userSignup, verifyOtp, userLogin, getAllUsers, updateDetails };
+const getUserDetails = async (req, res) => {
+  try {
+    const { userName } = req.params;
+
+    const getUser = await User.findOne({ userName });
+
+    if (!getUser) {
+      return res.status(404).json({
+        msg: "User not found",
+      });
+    }
+
+    const posts = await Post.find({ userId: getUser._id });
+
+    getUser.postCount = posts.length;
+    const PostCount = getUser.postCount || 0;
+    const followedCount = await followerDetails.find({ userId: getUser._id });
+    const followedCounts = followedCount.length > 0 ? followedCount.length : 0;
+    const followers = await followerDetails.find({
+      followingId: getUser._id,
+    });
+    const followersCount = followers.length > 0 ? followers.length : 0;
+
+    res.status(200).json({
+      msg: "User details fetched successfully",
+      data: {
+        getUser,
+        posts,
+        postCount: PostCount,
+        followedCount: followedCounts,
+        followersCount: followersCount,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching user details:", err);
+    res.status(500).json({
+      msg: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+export {
+  userSignup,
+  verifyOtp,
+  userLogin,
+  getAllUsers,
+  updateDetails,
+  getUserDetails,
+};
