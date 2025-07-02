@@ -65,7 +65,7 @@ const getFollowing = async (req, res) => {
   try {
     const following = await followerDetails
       .find({ userId: id })
-      .populate("followedUserId", "name");
+      .populate("followedUserId", "userName profileImageUrl");
     console.log(following);
     if (!following || following.length === 0) {
       return res.status(400).json({
