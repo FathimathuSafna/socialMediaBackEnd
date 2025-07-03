@@ -105,7 +105,7 @@ const userLogin = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const userId = req.user._id;
-    const users = await User.find({ _id: { $ne: userId } })
+    const users = await User.find({ _id: { $ne: userId } });
     res.status(200).json({
       msg: "All users",
       status: true,
@@ -153,7 +153,7 @@ const getUserDetails = async (req, res) => {
     const followedCount = await followerDetails.find({ userId: getUser._id });
     const followedCounts = followedCount.length > 0 ? followedCount.length : 0;
     const followers = await followerDetails.find({
-      followingId: getUser._id,
+      followedUserId: getUser._id,
     });
     const followersCount = followers.length > 0 ? followers.length : 0;
 
