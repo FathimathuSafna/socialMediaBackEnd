@@ -95,7 +95,7 @@ const userLogin = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    console.log("caught in updateDetails",err);
     res.status(400).json({
       msg: err,
     });
@@ -121,11 +121,13 @@ const getAllUsers = async (req, res) => {
 
 const updateDetails = async (req, res) => {
   try {
-    let id = req.params.id;
-    const updateUser = await User.findByIdAndUpdate(id, req.body, {
+    const userId = req.user._id;
+    console.log("details", req.body);
+    const updateUser = await User.findByIdAndUpdate({_id:userId}, req.body, {
       new: true,
     });
-    res.status(201).json({
+    console.log("updateUser", updateUser);
+    return res.status(201).json({
       msg: "User details updated succesfully",
       data: updateUser,
     });

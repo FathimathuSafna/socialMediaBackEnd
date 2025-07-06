@@ -3,7 +3,6 @@ import followerDetails from "../modals/followersSchema.js";
 import Likes from "../modals/likesSchema.js";
 
 const createPost = async (req, res) => {
-  console.log(req.body);
   let userId = req.user._id; //id passing from middleware
   const { location, postImageUrl, description, isArchived, status } = req.body;
   try {
