@@ -95,7 +95,7 @@ const userLogin = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log("caught in updateDetails",err);
+    console.log("caught in updateDetails", err);
     res.status(400).json({
       msg: err,
     });
@@ -123,7 +123,7 @@ const updateDetails = async (req, res) => {
   try {
     const userId = req.user._id;
     console.log("details", req.body);
-    const updateUser = await User.findByIdAndUpdate({_id:userId}, req.body, {
+    const updateUser = await User.findByIdAndUpdate({ _id: userId }, req.body, {
       new: true,
     });
     console.log("updateUser", updateUser);
@@ -138,35 +138,52 @@ const updateDetails = async (req, res) => {
 
 const getUserDetails = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { userName } = req.params;
 
     const getUser = await User.findOne({ userName });
-
+    const currentUser = await User.find({ userId: getUser._id });
+    if (currentUser) {
+      getUser.currentUser === true;
+    } else {
+      getUser.currentUser = false;
+    }
     if (!getUser) {
       return res.status(404).json({
         msg: "User not found",
       });
     }
 
+    const isFollowing = await followerDetails.findOne({
+      userId: userId,
+      followedUserId: getUser._id,
+    })
+    getUser.isFollowing = isFollowing ? true : false;
+
     const posts = await Post.find({ userId: getUser._id });
 
     getUser.postCount = posts.length;
     const PostCount = getUser.postCount || 0;
-    const followedCount = await followerDetails.find({ userId: getUser._id });
+    const followedCount = await followerDetails.find({ userId: getUser._id }).populate("followedUserId", "userName profileImageUrl");
     const followedCounts = followedCount.length > 0 ? followedCount.length : 0;
     const followers = await followerDetails.find({
       followedUserId: getUser._id,
-    });
+    }).populate("userId", "userName profileImageUrl");
     const followersCount = followers.length > 0 ? followers.length : 0;
 
     res.status(200).json({
       msg: "User details fetched successfully",
       data: {
         getUser,
+        isFollowing: getUser.isFollowing,
         posts,
         postCount: PostCount,
+        followedUsers:followedCount,
         followedCount: followedCounts,
+        followerUsers: followers,
         followersCount: followersCount,
+        currentUser:
+          getUser._id.toString() === userId.toString() ? true : false,
       },
     });
   } catch (err) {

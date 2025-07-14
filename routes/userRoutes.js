@@ -6,6 +6,6 @@ const app = express.Router()
 app.route('/').post(userSignup).get(protect,getAllUsers).put(protect,updateDetails)
 app.route('/verify').post(verifyOtp)
 app.route('/login').post(userLogin)
-app.route("/:userName").get(getUserDetails)
+app.route("/:userName").get(protect,getUserDetails)
 
 export default app

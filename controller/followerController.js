@@ -33,7 +33,8 @@ const follow = async (req, res) => {
 };
 
 const unfollow = async (req, res) => {
-  const { userId, followedUserId } = req.body;
+  const userId = req.user._id; 
+  const {  followedUserId } = req.body;
   try {
     const existUser = await followerDetails.findOne({
       userId,
@@ -60,12 +61,15 @@ const unfollow = async (req, res) => {
   }
 };
 
+
+
 const getFollowing = async (req, res) => {
   const id = req.user._id; // passed from middleware
   try {
     const following = await followerDetails
       .find({ userId: id })
       .populate("followedUserId", "userName profileImageUrl");
+      console.log("following", following);
     if (!following || following.length === 0) {
       return res.status(400).json({
         msg: "No following found",
@@ -88,6 +92,7 @@ const getFollowers = async (req,res) =>{
   const id = req.user._id
   try{
     const followers = await followerDetails.find({followedUserId:id}).populate("userId", "userName profileImageUrl");
+    console.log("followers", followers);
     if (followers){
       res.status(200).json({
         msg:"followers of user found",

@@ -3,7 +3,7 @@ import { follow,unfollow,getFollowing,getNonFollowings,getFollowers } from '../c
 import protect from '../middleWare/userMiddleWare.js'
 
 const app = express.Router()
-app.route('/').post(protect,follow).delete(unfollow).get(protect,getNonFollowings)
+app.route('/').post(protect,follow).delete(protect,unfollow).get(protect,getNonFollowings)
 app.route('/following').get(protect,getFollowing)
 app.route('/follower').get(protect,getFollowers)
 
