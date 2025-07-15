@@ -16,29 +16,49 @@ function generateOTP(length) {
 const userSignup = async (req, res) => {
   console.log(req.body);
   const otp = generateOTP(6);
-  console.log(otp);
-  const { phoneNumber } = req.body;
+  const { phoneNumber, userName , email } = req.body;
+
   try {
-    const existUser = await User.findOne({ phoneNumber });
+    const existUser = await User.findOne({
+      $or: [{ userName }, { phoneNumber },{email}],
+    });
+
     if (existUser) {
-      return res.status(400).json({
-        status: false,
-        msg: "User already exist",
-      });
+      if (existUser.userName === userName) {
+        return res.status(409).json({
+          status: false,
+          message: "Username already taken",
+        });
+      } else if (existUser.phoneNumber === phoneNumber) {
+        return res.status(409).json({
+          status: false,
+          message: "Phone number already registered",
+        });
+      } else if (existUser.email === email) {
+        return res.status(409).json({
+          status: false,
+          message: "Email already registered",
+        });
+      }
     }
+
     const userDetails = await User.create({ ...req.body, otp });
-    res.status(201).json({
-      msg: "User detailes added succesfully",
+
+    return res.status(201).json({
       status: true,
+      message: "User details added successfully",
       phoneNumber: userDetails.phoneNumber,
     });
   } catch (err) {
-    res.status(400).json({
+    console.error("Signup error:", err);
+    return res.status(500).json({
       status: false,
-      err,
+      message: "Server error",
+      error: err.message,
     });
   }
 };
+
 
 const verifyOtp = async (req, res) => {
   const { otp } = req.body;
@@ -66,7 +86,8 @@ const verifyOtp = async (req, res) => {
     }
   } catch (err) {
     res.status(400).json({
-      err,
+      msg:'invalid otp',
+      status: false,
     });
   }
 };
@@ -78,7 +99,7 @@ const userLogin = async (req, res) => {
     const existUser = await User.findOne({ phoneNumber });
     if (!existUser) {
       res.status(400).json({
-        msg: "user not verified",
+        msg: "invalid userName or Password",
       });
     }
     if (await existUser.matchPassword(password)) {
