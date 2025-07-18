@@ -103,4 +103,28 @@ const getFollowerPosts = async (req, res) => {
   }
 };
 
-export { createPost, getAllPosts, getFollowerPosts };
+const deletePost =async (req,res) =>{
+  try{
+    const Id = req.user._id
+    const { postId } = req.body
+    const deletedPost = await Post.deleteOne({_id:postId,userId:Id})
+    if (deletedPost){
+    return res.status(200).json({
+      msg:"Post Deleted Successfully",
+      status:true
+    })
+    }
+  else{
+    return res.status(400).json({
+      msg:"error"
+    })
+  }}
+    catch (err){
+      return res.status(400).json({
+        msg:"error occured"
+      })
+    }
+  }
+
+
+export { createPost, getAllPosts, getFollowerPosts,deletePost };
