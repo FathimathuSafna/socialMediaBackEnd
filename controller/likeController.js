@@ -2,18 +2,16 @@ import Likes from '../modals/likesSchema.js';
 
 const likePost = async (req, res) => {
     console.log(req.body);
-    const userid = req.user._id; // Assuming user ID is passed from middleware
+    const userid = req.user._id; 
     const { postId } = req.body;
     
     try {
-        // Check if the like already exists
         const existingLike = await Likes.findOne({ 
             userId:userid, 
             postId: postId,
             status: true
         });
         if (existingLike) {
-            // If it exists, remove the like
             await Likes.deleteOne({
                 userId: userid, 
                 postId:postId,

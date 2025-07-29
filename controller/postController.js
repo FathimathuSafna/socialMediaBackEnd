@@ -68,10 +68,8 @@ const getAllPosts = async (req, res) => {
 };
 
 const getFollowerPosts = async (req, res) => {
-  const id = req.user._id; // id passing from middleware
-
+  const id = req.user._id; 
   try {
-    // Step 1: Get all the users this person is following
     const following = await followerDetails.find({ userId: id });
 
     if (!following || following.length === 0) {
@@ -81,10 +79,8 @@ const getFollowerPosts = async (req, res) => {
       });
     }
 
-    // Step 2: Extract all followedUserId values into an array
     const followedUserIds = following.map((f) => f.followedUserId);
 
-    // Step 3: Get posts by those followed users
     const posts = await Post.find({
       userId: { $in: followedUserIds },
     }).populate("userId", "name");
@@ -127,4 +123,20 @@ const deletePost =async (req,res) =>{
   }
 
 
-export { createPost, getAllPosts, getFollowerPosts,deletePost };
+const getPostLikeCount = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    if (!postId) {
+      return res.status(400).json({ message: "postId is required" });
+    }
+    const getLikeCount = await Likes.find({ postId:postId });
+    const likeCount = getLikeCount.length;
+    return res.status(200).json({ likeCount });
+  } catch (err) {
+    console.error("Error fetching like count:", err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export { createPost, getAllPosts, getFollowerPosts,deletePost,getPostLikeCount };

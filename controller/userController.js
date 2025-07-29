@@ -216,6 +216,25 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+const getUserMessage = async (req,res) =>{
+  const {userName} = req.params
+  try{
+  const getUser = await User.find({userName})
+  if(getUser){
+    return res.status(200).json({
+      msg:"user fetched successfully",
+      data:getUser
+    })
+  } else {
+    return res. status(400).json({
+      msg:"no user found"
+    })
+  }}
+  catch(error){
+    console.error("error during fetching user:",error)
+  }
+}
+
 export {
   userSignup,
   verifyOtp,
@@ -223,4 +242,5 @@ export {
   getAllUsers,
   updateDetails,
   getUserDetails,
+  getUserMessage,
 };
