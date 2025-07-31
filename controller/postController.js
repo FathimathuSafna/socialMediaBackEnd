@@ -29,7 +29,10 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
-    let posts = await Post.find().limit(20).populate("userId", "userName profilePictureUrl").lean();
+    let posts = await Post.find()
+      .limit(20)
+      .populate("userId", "userName profilePictureUrl")
+      .lean();
     posts = await Promise.all(
       posts.map(async (post) => {
         try {
@@ -39,7 +42,9 @@ const getAllPosts = async (req, res) => {
           post.likeCount = likes.length;
           if (post.likeCount > 0) {
             post.isLiked = likes.some(
-              (like) =>like.userId && like.userId.toString() === req.user._id.toString()
+              (like) =>
+                like.userId &&
+                like.userId.toString() === req.user._id.toString()
             );
           } else {
             post.isLiked = false;
@@ -68,7 +73,7 @@ const getAllPosts = async (req, res) => {
 };
 
 const getFollowerPosts = async (req, res) => {
-  const id = req.user._id; 
+  const id = req.user._id;
   try {
     const following = await followerDetails.find({ userId: id });
 
@@ -99,29 +104,27 @@ const getFollowerPosts = async (req, res) => {
   }
 };
 
-const deletePost =async (req,res) =>{
-  try{
-    const Id = req.user._id
-    const { postId } = req.body
-    const deletedPost = await Post.deleteOne({_id:postId,userId:Id})
-    if (deletedPost){
-    return res.status(200).json({
-      msg:"Post Deleted Successfully",
-      status:true
-    })
-    }
-  else{
-    return res.status(400).json({
-      msg:"error"
-    })
-  }}
-    catch (err){
+const deletePost = async (req, res) => {
+  try {
+    const Id = req.user._id;
+    const { postId } = req.body;
+    const deletedPost = await Post.deleteOne({ _id: postId, userId: Id });
+    if (deletedPost) {
+      return res.status(200).json({
+        msg: "Post Deleted Successfully",
+        status: true,
+      });
+    } else {
       return res.status(400).json({
-        msg:"error occured"
-      })
+        msg: "error",
+      });
     }
+  } catch (err) {
+    return res.status(400).json({
+      msg: "error occured",
+    });
   }
-
+};
 
 const getPostLikeCount = async (req, res) => {
   try {
@@ -129,7 +132,7 @@ const getPostLikeCount = async (req, res) => {
     if (!postId) {
       return res.status(400).json({ message: "postId is required" });
     }
-    const getLikeCount = await Likes.find({ postId:postId });
+    const getLikeCount = await Likes.find({ postId: postId });
     const likeCount = getLikeCount.length;
     return res.status(200).json({ likeCount });
   } catch (err) {
@@ -138,5 +141,10 @@ const getPostLikeCount = async (req, res) => {
   }
 };
 
-
-export { createPost, getAllPosts, getFollowerPosts,deletePost,getPostLikeCount };
+export {
+  createPost,
+  getAllPosts,
+  getFollowerPosts,
+  deletePost,
+  getPostLikeCount,
+};
