@@ -53,20 +53,14 @@ const getConversation = async (req, res) => {
     const { userName } = req.params;
     const currentUserId = req.user.id;
 
-    // Find the recipient user by userName
     const recipientUser = await User.findOne({ userName });
     if (!recipientUser) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // Get both IDs
     const recipientId = recipientUser._id.toString();
     const conversationId = [currentUserId, recipientId].sort().join("_");
-
-    // Fetch the conversation
     const conversation = await Conversation.findOne({ conversationId });
 
-    // Get sender (current user) details
     const senderUser = await User.findById(currentUserId);
     if (!senderUser) {
       return res.status(404).json({ message: "Sender user not found" });

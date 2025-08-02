@@ -11,7 +11,7 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import socketHandler from "./socket.js";
-import jwt from 'jsonwebtoken'; // 👈 Make sure to import jwt
+import jwt from 'jsonwebtoken'; 
 
 // Configure CORS
 const corsOptions = {
@@ -26,10 +26,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// http server for socket.io
 const server = http.createServer(app);
 
-// Socket.IO setup
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
@@ -38,7 +36,7 @@ const io = new Server(server, {
   },
 });
 
-// ✅ ADD THIS SOCKET.IO MIDDLEWARE
+
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
 
@@ -46,18 +44,15 @@ io.use((socket, next) => {
     return next(new Error("Authentication Error: No token provided."));
   }
 
-  // Use the same secret key as your protect middleware
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
       return next(new Error("Authentication Error: Invalid token."));
     }
-    // The decoded token (which contains the user 'id') is attached to the socket.
     socket.user = decoded;
     next();
   });
 });
 
-// Socket event handling
 socketHandler(io);
 
 const PORT = process.env.PORT || 5000;
