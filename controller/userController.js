@@ -3,6 +3,7 @@ import Post from "../modals/postsSchema.js";
 import User from "../modals/userSchema.js";
 import generateToken from "../utils/generateToken.js";
 import followerDetails from "../modals/followersSchema.js";
+import { sendOTPEmail } from "../utils/emailService.js"; // Our new email servic
 
 function generateOTP(length) {
   const digits = "0123456789";
@@ -16,11 +17,11 @@ function generateOTP(length) {
 const userSignup = async (req, res) => {
   console.log(req.body);
   const otp = generateOTP(6);
-  const { phoneNumber, userName , email } = req.body;
+  const { phoneNumber, userName, email } = req.body;
 
   try {
     const existUser = await User.findOne({
-      $or: [{ userName }, { phoneNumber },{email}],
+      $or: [{ userName }, { phoneNumber }, { email }],
     });
 
     if (existUser) {
@@ -43,11 +44,14 @@ const userSignup = async (req, res) => {
     }
 
     const userDetails = await User.create({ ...req.body, otp });
+    await sendOTPEmail(userDetails.email, otp);
 
     return res.status(201).json({
       status: true,
       message: "User details added successfully",
       phoneNumber: userDetails.phoneNumber,
+      userName: userDetails.userName,
+      email:userDetails.email
     });
   } catch (err) {
     console.error("Signup error:", err);
@@ -58,7 +62,6 @@ const userSignup = async (req, res) => {
     });
   }
 };
-
 
 const verifyOtp = async (req, res) => {
   const { otp } = req.body;
@@ -86,7 +89,7 @@ const verifyOtp = async (req, res) => {
     }
   } catch (err) {
     res.status(400).json({
-      msg:'invalid otp',
+      msg: "invalid otp",
       status: false,
     });
   }
@@ -178,18 +181,22 @@ const getUserDetails = async (req, res) => {
     const isFollowing = await followerDetails.findOne({
       userId: userId,
       followedUserId: getUser._id,
-    })
+    });
     getUser.isFollowing = isFollowing ? true : false;
 
     const posts = await Post.find({ userId: getUser._id });
 
     getUser.postCount = posts.length;
     const PostCount = getUser.postCount || 0;
-    const followedCount = await followerDetails.find({ userId: getUser._id }).populate("followedUserId", "userName profileImageUrl");
+    const followedCount = await followerDetails
+      .find({ userId: getUser._id })
+      .populate("followedUserId", "userName profileImageUrl");
     const followedCounts = followedCount.length > 0 ? followedCount.length : 0;
-    const followers = await followerDetails.find({
-      followedUserId: getUser._id,
-    }).populate("userId", "userName profileImageUrl");
+    const followers = await followerDetails
+      .find({
+        followedUserId: getUser._id,
+      })
+      .populate("userId", "userName profileImageUrl");
     const followersCount = followers.length > 0 ? followers.length : 0;
 
     res.status(200).json({
@@ -199,7 +206,7 @@ const getUserDetails = async (req, res) => {
         isFollowing: getUser.isFollowing,
         posts,
         postCount: PostCount,
-        followedUsers:followedCount,
+        followedUsers: followedCount,
         followedCount: followedCounts,
         followerUsers: followers,
         followersCount: followersCount,
@@ -216,24 +223,24 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-const getUserMessage = async (req,res) =>{
-  const {userName} = req.params
-  try{
-  const getUser = await User.find({userName})
-  if(getUser){
-    return res.status(200).json({
-      msg:"user fetched successfully",
-      data:getUser
-    })
-  } else {
-    return res. status(400).json({
-      msg:"no user found"
-    })
-  }}
-  catch(error){
-    console.error("error during fetching user:",error)
+const getUserMessage = async (req, res) => {
+  const { userName } = req.params;
+  try {
+    const getUser = await User.find({ userName });
+    if (getUser) {
+      return res.status(200).json({
+        msg: "user fetched successfully",
+        data: getUser,
+      });
+    } else {
+      return res.status(400).json({
+        msg: "no user found",
+      });
+    }
+  } catch (error) {
+    console.error("error during fetching user:", error);
   }
-}
+};
 
 export {
   userSignup,

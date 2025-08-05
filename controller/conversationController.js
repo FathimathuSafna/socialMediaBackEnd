@@ -2,8 +2,8 @@ import Conversation from "../modals/messageSchema.js";
 import User from "../modals/userSchema.js";
 
 const createConversation = async (req, res) => {
-  const senderId = req.user._id  
-  const {  receiverId, message } = req.body;
+  const senderId = req.user._id;
+  const { receiverId, message } = req.body;
   try {
     const idsSorted = [senderId, receiverId].sort();
     const conversationId = `${idsSorted[0]}_${idsSorted[1]}`;
@@ -73,21 +73,57 @@ const getConversation = async (req, res) => {
         _id: senderUser._id,
         userName: senderUser.userName,
         name: senderUser.name,
-        profileImageUrl: senderUser.profileImageUrl
+        profileImageUrl: senderUser.profileImageUrl,
       },
       recipient: {
         _id: recipientUser._id,
         userName: recipientUser.userName,
         name: recipientUser.name,
-        profileImageUrl: recipientUser.profileImageUrl
-      }
+        profileImageUrl: recipientUser.profileImageUrl,
+      },
     });
-
   } catch (error) {
     console.error("Error fetching conversation:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+const getMsgUser = async (req, res) => {
+  const userId = req.user._id;
 
-export { createConversation, getConversation };
+  try {
+    const conversations = await Conversation.find({
+      $or: [{ "messages.senderId": userId }, { "messages.receiverId": userId }],
+    })
+      .populate("messages.senderId", "userName name profilePictureUrl")
+      .populate("messages.receiverId", "userName name profilePictureUrl");
+
+    const users = [];
+
+    conversations.forEach((conv) => {
+      conv.messages.forEach((msg) => {
+        const otherUser =
+          msg.senderId._id.toString() === userId.toString()
+            ? msg.receiverId
+            : msg.senderId;
+
+        if (
+          otherUser &&
+          !users.find((u) => u._id.toString() === otherUser._id.toString())
+        ) {
+          users.push(otherUser);
+        }
+      });
+    });
+
+    return res.status(200).json({ message: "Data fetched", data: users });
+  } catch (error) {
+    console.error("Error during fetching user:", error);
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+export { createConversation, getConversation, getMsgUser };

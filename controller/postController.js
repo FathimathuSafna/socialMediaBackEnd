@@ -1,6 +1,8 @@
 import Post from "../modals/postsSchema.js";
 import followerDetails from "../modals/followersSchema.js";
 import Likes from "../modals/likesSchema.js";
+import Comment from "../modals/commentsSchema.js";
+
 
 const createPost = async (req, res) => {
   let userId = req.user._id; //id passing from middleware
@@ -54,6 +56,19 @@ const getAllPosts = async (req, res) => {
           post.likeCount = 0;
           post.isLiked = false;
         }
+
+        const comments = await Comment.find({ postId: post._id });
+        post.commentCount = comments.length;
+        if (post.commentCount > 0) {
+          post.isComment = comments.some(
+            (comment) =>
+              comment.userId &&
+              comment.userId.toString() === req.user._id.toString()
+          );
+        } else {
+          post.isComment = false;
+        }
+
         return post;
       })
     );

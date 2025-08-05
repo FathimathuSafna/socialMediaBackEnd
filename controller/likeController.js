@@ -41,4 +41,30 @@ const likePost = async (req, res) => {
   }
 };
 
-export { likePost };
+const likeUsers = async (req, res) => {
+  const postId = req.params.id;
+
+  try {
+    const likes = await Likes.find({ postId }).populate(
+      "userId",
+      "userName name profilePictureUrl"
+    );
+
+    if (likes && likes.length > 0) {
+      const users = likes.map((like) => like.userId); // Extract only user details
+      console.log("usets",users)
+      return res.status(200).json({
+        message: "Users fetched successfully",
+        data: users,
+      });
+    } else {
+      return res.status(404).json({ message: "No users found for this post" });
+    }
+  } catch (error) {
+    console.error("Error occurred:", error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+export { likePost, likeUsers};
