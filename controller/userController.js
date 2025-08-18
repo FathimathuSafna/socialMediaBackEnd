@@ -190,13 +190,13 @@ const getUserDetails = async (req, res) => {
     const PostCount = getUser.postCount || 0;
     const followedCount = await followerDetails
       .find({ userId: getUser._id })
-      .populate("followedUserId", "userName profileImageUrl");
+      .populate("followedUserId", "userName profilePictureUrl");
     const followedCounts = followedCount.length > 0 ? followedCount.length : 0;
     const followers = await followerDetails
       .find({
         followedUserId: getUser._id,
       })
-      .populate("userId", "userName profileImageUrl");
+      .populate("userId", "userName profilePictureUrl");
     const followersCount = followers.length > 0 ? followers.length : 0;
 
     res.status(200).json({

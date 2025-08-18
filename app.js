@@ -55,7 +55,7 @@ io.use((socket, next) => {
 
 socketHandler(io);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 80;
 app.get("/", (req, res) => {
   res.send("Hello world !");
 });

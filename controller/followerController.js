@@ -128,7 +128,7 @@ const getNonFollowings = async (req, res) => {
         { _id: { $nin: followerIds } },
         { _id: { $ne: id } },
       ],
-    }).limit(4).select("userName profileImageUrl");
+    }).limit(4).select("userName profilePictureUrl");
 
     if (!nonFollowers || nonFollowers.length === 0) {
       return res.status(404).json({
