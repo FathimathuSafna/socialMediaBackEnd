@@ -11,52 +11,32 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import socketHandler from "./socket.js";
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'; 
 
-// Allowed origins
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://appmosphere.safna.online"
-];
-
-// Dynamic CORS for Express
+// Configure CORS
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS policy: This origin is not allowed"));
-    }
-  },
+  origin: ["https://appmosphere.safna.online","http://localhost:5173", ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
 };
 
 const app = express();
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Pre-flight support
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const server = http.createServer(app);
 
-// Dynamic CORS for Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Socket.IO CORS: Origin not allowed"));
-      }
-    },
+    origin: ["https://appmosphere.safna.online","http://localhost:5173",],
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-// JWT Middleware for Socket.IO
+
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
 
@@ -73,26 +53,22 @@ io.use((socket, next) => {
   });
 });
 
-// Start socket handling
 socketHandler(io);
 
-// Routes
+const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
   res.send("Hello world !");
 });
 
 app.use("/user", userRoutes);
 app.use("/post", postRoutes);
-app.use("/follow", followerRoutes);
-app.use("/comment", commentRoutes);
-app.use("/like", likeRoutes);
+app.use('/follow', followerRoutes);
+app.use('/comment', commentRoutes);
+app.use('/like', likeRoutes);
 app.use("/message", conversationRoutes);
 
-// Start server
-const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`server is running on ${PORT}`);
 });
 
-// Connect DB
 connectDB();
