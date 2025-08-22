@@ -15,7 +15,7 @@ import jwt from 'jsonwebtoken';
 
 // Configure CORS
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "https://appmosphere.safna.online"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
@@ -55,7 +55,7 @@ io.use((socket, next) => {
 
 socketHandler(io);
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
   res.send("Hello world !");
 });
