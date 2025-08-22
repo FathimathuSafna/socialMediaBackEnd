@@ -13,53 +13,30 @@ import cors from "cors";
 import socketHandler from "./socket.js";
 import jwt from 'jsonwebtoken'; 
 
-const app = express();
-const server = http.createServer(app);
-
-// ✅ Allowed Origins
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://appmosphere.safna.online"
-];
-
-// ✅ CORS Options for Express
+// Configure CORS
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser clients (like mobile apps, Postman)
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS policy: This origin is not allowed"));
-    }
-  },
+  origin: ["https://appmosphere.safna.online","http://localhost:5173", ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
 };
 
-// ✅ Apply CORS Middleware
+const app = express();
 app.use(cors(corsOptions));
 
-// ✅ Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Socket.IO with CORS
+const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Socket.IO CORS: This origin is not allowed"));
-      }
-    },
+    origin: ["https://appmosphere.safna.online","http://localhost:5173",],
     methods: ["GET", "POST"],
     credentials: true,
-  }
+  },
 });
 
-// ✅ Socket.IO JWT Auth Middleware
+
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
 
@@ -76,34 +53,22 @@ io.use((socket, next) => {
   });
 });
 
-// ✅ Socket Event Handling
 socketHandler(io);
 
-// ✅ Health Check Route
+const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
   res.send("Hello world !");
 });
 
-// ✅ Routes
 app.use("/user", userRoutes);
 app.use("/post", postRoutes);
-app.use("/follow", followerRoutes);
-app.use("/comment", commentRoutes);
-app.use("/like", likeRoutes);
+app.use('/follow', followerRoutes);
+app.use('/comment', commentRoutes);
+app.use('/like', likeRoutes);
 app.use("/message", conversationRoutes);
 
-// ✅ Global Error Handler (optional, for catching CORS or other errors)
-app.use((err, req, res, next) => {
-  if (err.message.includes("CORS")) {
-    return res.status(403).json({ message: err.message });
-  }
-  return res.status(500).json({ message: "Internal Server Error" });
-});
-
-// ✅ Connect DB and Start Server
-const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`server is running on ${PORT}`);
 });
 
 connectDB();
