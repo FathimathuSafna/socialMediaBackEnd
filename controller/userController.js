@@ -101,7 +101,7 @@ const userLogin = async (req, res) => {
   try {
     const existUser = await User.findOne({ phoneNumber });
     if (!existUser) {
-      res.status(400).json({
+      return res.status(400).json({
         msg: "invalid userName or Password",
       });
     }

@@ -1,17 +1,23 @@
-import sgMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 
-// Set the API key for the SendGrid mail service
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// Create SMTP transporter using Gmail app credentials
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 /**
- * Sends an OTP email to the user using SendGrid.
+ * Sends an OTP email to the user using Nodemailer.
  * @param {string} to - The recipient's email address.
  * @param {string} otp - The one-time password to send.
  */
 export const sendOTPEmail = async (to, otp) => {
-  const msg = {
-    to: to, // Recipient
-    from :process.env.SENDGRID_VERIFIED_SENDER,
+  const mailOptions = {
+    from: process.env.SMTP_USER,
+    to: to,
     subject: 'Your OTP for Appmosphere Verification',
     html: `
       <div style="font-family: Arial, sans-serif; color: #333;">
@@ -27,14 +33,11 @@ export const sendOTPEmail = async (to, otp) => {
   };
 
   try {
-    await sgMail.send(msg);
-    console.log('SendGrid email sent successfully to:', to);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Nodemailer email sent successfully to:', to, info.messageId);
     return { success: true, message: 'Email sent successfully' };
   } catch (error) {
-    console.error('Error sending SendGrid email:', error);
-    if (error.response) {
-      console.error(error.response.body);
-    }
+    console.error('Error sending Nodemailer email:', error);
     // Throw an error so the controller can catch it
     throw new Error('Failed to send verification email.');
   }
