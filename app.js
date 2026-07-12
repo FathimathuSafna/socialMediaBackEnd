@@ -16,7 +16,12 @@ import jwt from 'jsonwebtoken';
 
 // Configure CORS
 const corsOptions = {
-  origin: ["https://appmosphere.safna.online","http://localhost:5173", ],
+  origin: [
+    "https://appmosphere.safna.online",
+    "http://localhost:5173",
+    "https://e-commerce-ui-gilt.vercel.app",
+    "https://e-commerce-ui-gilt.vercel.app/"
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
@@ -31,7 +36,12 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://appmosphere.safna.online","http://localhost:5173",],
+    origin: [
+      "https://appmosphere.safna.online",
+      "http://localhost:5173",
+      "https://e-commerce-ui-gilt.vercel.app",
+      "https://e-commerce-ui-gilt.vercel.app/"
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
