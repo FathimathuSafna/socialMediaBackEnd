@@ -12,16 +12,19 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import socketHandler from "./socket.js";
-import jwt from 'jsonwebtoken'; 
+import jwt from 'jsonwebtoken';
 
-// Configure CORS
+// Configure CORS allowed origins
+const allowedOrigins = [
+  "https://social-media-ui-phi.vercel.app",
+  "https://appmosphere.safna.online",
+  "http://localhost:5173",
+  "https://e-commerce-ui-gilt.vercel.app",
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 const corsOptions = {
-  origin: [
-    "https://appmosphere.safna.online",
-    "http://localhost:5173",
-    "https://e-commerce-ui-gilt.vercel.app",
-    "https://e-commerce-ui-gilt.vercel.app/"
-  ],
+  origin: allowedOrigins,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
@@ -36,12 +39,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://appmosphere.safna.online",
-      "http://localhost:5173",
-      "https://e-commerce-ui-gilt.vercel.app",
-      "https://e-commerce-ui-gilt.vercel.app/"
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
