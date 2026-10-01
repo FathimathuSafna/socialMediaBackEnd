@@ -16,6 +16,7 @@ import jwt from 'jsonwebtoken';
 
 // Configure CORS allowed origins
 const allowedOrigins = [
+  "https://appmosphere.netlify.app",
   "https://social-media-ui-phi.vercel.app",
   "https://appmosphere.safna.online",
   "http://localhost:5173",
