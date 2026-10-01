@@ -22,11 +22,18 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://e-commerce-ui-gilt.vercel.app",
   process.env.CLIENT_URL
-].filter(Boolean);
+].filter(Boolean).map(url => url.trim().replace(/\/$/, ""));
 
 const corsOptions = {
-  origin: allowedOrigins,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const cleanOrigin = origin.trim().replace(/\/$/, "");
+    if (allowedOrigins.includes(cleanOrigin) || cleanOrigin.endsWith(".netlify.app") || cleanOrigin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
 };
 
@@ -40,23 +47,31 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.trim().replace(/\/$/, "");
+      if (allowedOrigins.includes(cleanOrigin) || cleanOrigin.endsWith(".netlify.app") || cleanOrigin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-
 io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
+  const token = socket.handshake.auth?.token || socket.handshake.headers?.token;
 
-  if (!token) {
-    return next(new Error("Authentication Error: No token provided."));
+  if (!token || token === "null" || token === "undefined") {
+    socket.user = null;
+    return next();
   }
 
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
-      return next(new Error("Authentication Error: Invalid token."));
+      socket.user = null;
+      return next();
     }
     socket.user = decoded;
     next();
