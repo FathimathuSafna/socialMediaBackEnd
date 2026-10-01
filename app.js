@@ -24,15 +24,17 @@ const allowedOrigins = [
   process.env.CLIENT_URL
 ].filter(Boolean).map(url => url.trim().replace(/\/$/, ""));
 
+const checkCorsOrigin = (origin, callback) => {
+  if (!origin) return callback(null, true);
+  const cleanOrigin = origin.trim().replace(/\/$/, "");
+  if (allowedOrigins.includes(cleanOrigin) || cleanOrigin.endsWith(".netlify.app") || cleanOrigin.endsWith(".vercel.app")) {
+    return callback(null, origin);
+  }
+  return callback(null, origin);
+};
+
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    const cleanOrigin = origin.trim().replace(/\/$/, "");
-    if (allowedOrigins.includes(cleanOrigin) || cleanOrigin.endsWith(".netlify.app") || cleanOrigin.endsWith(".vercel.app")) {
-      return callback(null, true);
-    }
-    return callback(null, true);
-  },
+  origin: checkCorsOrigin,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
 };
@@ -47,14 +49,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      const cleanOrigin = origin.trim().replace(/\/$/, "");
-      if (allowedOrigins.includes(cleanOrigin) || cleanOrigin.endsWith(".netlify.app") || cleanOrigin.endsWith(".vercel.app")) {
-        return callback(null, true);
-      }
-      return callback(null, true);
-    },
+    origin: checkCorsOrigin,
     methods: ["GET", "POST"],
     credentials: true,
   },
