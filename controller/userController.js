@@ -44,14 +44,19 @@ const userSignup = async (req, res) => {
     }
 
     const userDetails = await User.create({ ...req.body, otp });
-    await sendOTPEmail(userDetails.email, otp);
+
+    try {
+      await sendOTPEmail(userDetails.email, otp);
+    } catch (emailError) {
+      console.error("OTP Email sending failed (check Render SMTP credentials):", emailError.message);
+    }
 
     return res.status(201).json({
       status: true,
       message: "User details added successfully",
       phoneNumber: userDetails.phoneNumber,
       userName: userDetails.userName,
-      email:userDetails.email
+      email: userDetails.email
     });
   } catch (err) {
     console.error("Signup error:", err);
